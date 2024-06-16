@@ -20,7 +20,7 @@ public class FilmeService {
     }
 
     public List<Filme> filterByNome(String nome){
-        return rep.findByNome(nome+"%");
+        return rep.findByNome("%"+nome+"%");
     }
 
     public Optional<Filme> getById(Long id){
@@ -42,6 +42,15 @@ public class FilmeService {
             return rep.save(db);
         }
         return null;
+    }
+
+    public Boolean delete(Long id){
+        var opt = rep.findById(id);
+        if(opt.isPresent()){
+            rep.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
 
