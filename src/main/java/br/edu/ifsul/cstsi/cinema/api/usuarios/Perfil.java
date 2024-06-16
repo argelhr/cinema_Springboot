@@ -16,9 +16,8 @@ public class Perfil implements GrantedAuthority {
     @ManyToMany(mappedBy = "perfis")
     private List<Usuario> usuarios;
 
-
     @Override
     public String getAuthority() {
-        return null;
+        return nome;
     }
 }
