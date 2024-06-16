@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,7 +26,7 @@ public class FilmeController {
         return ResponseEntity.ok(filmes);
     }
 
-    @GetMapping("/filme/{nome}")
+    @GetMapping("/filme/nome/{nome}")
     @ApiOperation(value = "Retorna os filmes com o nome filtado")
     public ResponseEntity<List<Filme>> selectByNome(@PathVariable("nome") String nome) {
         List<Filme> filmes = service.filterByNome(nome);
@@ -35,7 +36,7 @@ public class FilmeController {
                 ResponseEntity.ok(filmes);
     }
 
-    @GetMapping("/filme/{id}")
+    @GetMapping("/filme/id/{id}")
     @ApiOperation(value = "Retorna um filme de acordo com o id")
     public ResponseEntity<Filme> selectById(@PathVariable("id") Long id) {
 
@@ -45,6 +46,7 @@ public class FilmeController {
     }
 
     @PostMapping
+    @Secured({"ROLE_ADMIN"})
     @ApiOperation(value = "Insere um filme")
     public ResponseEntity<String> insert(@RequestBody Filme f) {
         Filme filme = service.insert(f);
@@ -53,12 +55,21 @@ public class FilmeController {
     }
 
     @PutMapping("/{id}")
+    @Secured({"ROLE_ADMIn"})
     public ResponseEntity<Filme> update(@PathVariable("id") Long id, @RequestBody Filme f) {
         f.setId(id);
         var retorno = service.update(id, f);
         return retorno != null ?
                 ResponseEntity.ok().build() :
                 ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping({"/{id}"})
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity<String> delete(@PathVariable("id") Long id){
+        return service.delete(id)
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.notFound().build();
     }
 
     private URI getUri(Long id) {
