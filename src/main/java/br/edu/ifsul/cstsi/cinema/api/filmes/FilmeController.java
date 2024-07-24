@@ -25,9 +25,16 @@ public class FilmeController {
         List<Filme> filmes = service.getFilmes();
         return ResponseEntity.ok(filmes);
     }
+    @GetMapping("{id}")
+    @ApiOperation(value = "Retorna um filme de acordo com o id")
+    public ResponseEntity<Filme> selectById(@PathVariable("id") Long id) {
 
-    @GetMapping("/filme/nome/{nome}")
-    @ApiOperation(value = "Retorna os filmes com o nome filtado")
+        var f = service.getById(id);
+
+        return f.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
+    }
+    @GetMapping("nome/{nome}")
+    @ApiOperation(value = "Retorna os filmes com o nome filtrado")
     public ResponseEntity<List<Filme>> selectByNome(@PathVariable("nome") String nome) {
         List<Filme> filmes = service.filterByNome(nome);
 
@@ -36,14 +43,7 @@ public class FilmeController {
                 ResponseEntity.ok(filmes);
     }
 
-    @GetMapping("/filme/id/{id}")
-    @ApiOperation(value = "Retorna um filme de acordo com o id")
-    public ResponseEntity<Filme> selectById(@PathVariable("id") Long id) {
 
-        var f = service.getById(id);
-
-        return f.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
-    }
 
     @PostMapping
     @Secured({"ROLE_ADMIN"})
@@ -54,8 +54,8 @@ public class FilmeController {
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping("/{id}")
-    @Secured({"ROLE_ADMIn"})
+    @PutMapping("{id}")
+    @Secured({"ROLE_ADMIN"})
     public ResponseEntity<Filme> update(@PathVariable("id") Long id, @RequestBody Filme f) {
         f.setId(id);
         var retorno = service.update(id, f);
@@ -64,7 +64,7 @@ public class FilmeController {
                 ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping({"/{id}"})
+    @DeleteMapping({"{id}"})
     @Secured({"ROLE_ADMIN"})
     public ResponseEntity<String> delete(@PathVariable("id") Long id){
         return service.delete(id)
